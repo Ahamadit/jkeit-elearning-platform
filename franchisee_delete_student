@@ -1,0 +1,57 @@
+<?php
+session_start();
+if (!isset($_SESSION['franchisee_id'])) {
+    header("Location: franchisee_login.php");
+    exit;
+}
+
+include __DIR__ . '/database.php';
+
+$show_sweetalert = false;
+
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $student_id = intval($_GET['id']);
+
+    $stmt = $conn->prepare("DELETE FROM franchisee_students WHERE id = ?");
+    $stmt->bind_param("i", $student_id);
+    if ($stmt->execute()) {
+        $show_sweetalert = true;
+    }
+    $stmt->close();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delete Student</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+<?php if ($show_sweetalert): ?>
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Deleted!',
+    text: 'Student record deleted successfully.',
+    confirmButtonColor: '#007bff'
+}).then(() => {
+    window.location.href = "franchisee_student.php"; // redirect after popup
+});
+</script>
+<?php else: ?>
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Error!',
+    text: 'Something went wrong while deleting.',
+    confirmButtonColor: '#007bff'
+}).then(() => {
+    window.location.href = "franchisee_student.php"; // redirect anyway
+});
+</script>
+<?php endif; ?>
+</body>
+</html>
